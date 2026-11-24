@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="el"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Βλαβολόγιο Κλιματισμού – νέα διεύθυνση</title>
+<meta name="theme-color" content="#0F1B25">
+<style>
+body{margin:0;font:16px/1.5 -apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#E4E9ED;color:#13232F;display:flex;min-height:100vh;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
+@media (prefers-color-scheme:dark){body{background:#0F1B25;color:#E6EEF3}.c{background:#16283A!important;border-color:#24384c!important}.s{color:#9fb3c2!important}}
+.c{max-width:440px;width:100%;background:#fff;border:1px solid #d5dde3;border-radius:18px;padding:20px;box-shadow:0 8px 30px rgba(0,0,0,.12)}
+img{width:56px;height:56px;border-radius:14px}h1{font-size:20px;margin:10px 0 6px}
+.u{font-weight:700;color:#1d5fa8;word-break:break-all}
+button,a.b{display:block;width:100%;box-sizing:border-box;margin-top:10px;height:48px;border-radius:12px;border:1px solid #c7d2da;background:#f1f5f8;color:inherit;font:inherit;font-weight:700;text-align:center;line-height:46px;text-decoration:none;cursor:pointer}
+button.p{background:#1d5fa8;border-color:#1d5fa8;color:#fff}.s{font-size:14px;color:#5b6b78;margin-top:10px}#st{margin-top:10px;font-weight:600}
+</style></head><body><div class="c">
+<img src="https://vlavologio.github.io/icon.png" alt="">
+<h1>Το Βλαβολόγιο άλλαξε διεύθυνση</h1>
+<div>Νέα διεύθυνση: <span class="u">vlavologio.github.io</span></div>
+<div id="box"></div>
+<div id="st"></div>
+</div>
+<script>
+var NEW="https://vlavologio.github.io/";
+function all(){ var o={},n=0; try{ for(var i=0;i<localStorage.length;i++){ var k=localStorage.key(i); if(/^vl_/.test(k)){ o[k]=localStorage.getItem(k); n++; } } }catch(x){} return o; }
+function hasData(o){ function len(k,e){ try{ var v=JSON.parse(o[k]||e); return Array.isArray(v)?v.length:Object.keys(v||{}).length; }catch(x){ return 0; } }
+  return len("vl_hist","[]")+len("vl_notes","{}")+len("vl_tech","{}")+len("vl_mymap","[]")+len("vl_serlearn","[]")+len("vl_meas","{}")+len("vl_plist","[]")>0; }
+var LSD=all(), box=document.getElementById("box"), st=document.getElementById("st");
+if(!hasData(LSD)){ box.innerHTML='<div class="s">Μεταφέρεσαι αυτόματα…</div><a class="b" href="'+NEW+'">Άνοιγμα</a>'; location.replace(NEW); }
+else {
+  box.innerHTML='<div class="s">Σε αυτό το κινητό έχεις αποθηκευμένα δεδομένα (πελάτες, σημειώσεις, στοιχεία τεχνικού). Πάτα το μπλε κουμπί για να μεταφερθούν στη νέα διεύθυνση.</div>'+
+   '<button class="p" id="go">➡️ Μεταφορά δεδομένων & άνοιγμα</button>'+
+   '<button id="dl">📥 Κατέβασε αντίγραφο (για επαναφορά)</button>'+
+   '<a class="b" href="'+NEW+'">Άνοιγμα χωρίς μεταφορά</a>'+
+   '<div class="s">Αν η μεταφορά δεν γίνει (π.χ. σε iPhone από την αρχική οθόνη): κατέβασε το αντίγραφο, άνοιξε τη νέα διεύθυνση και πήγαινε <b>Πελάτες → ⬆️ Επαναφορά</b>. Μετά πρόσθεσε τη νέα διεύθυνση στην αρχική οθόνη και σβήσε την παλιά.</div>';
+  var w=null;
+  document.getElementById("go").onclick=function(){
+    w=window.open(NEW+"#mig=1","_blank");
+    if(!w){ st.textContent="⚠️ Ο browser δεν άνοιξε νέα καρτέλα. Χρησιμοποίησε το «Κατέβασε αντίγραφο»."; return; }
+    st.textContent="⏳ Μεταφορά…";
+  };
+  window.addEventListener("message",function(e){
+    if(e.origin!=="https://vlavologio.github.io"||!e.data) return;
+    if(e.data.t==="vlmig-ready" && w){ w.postMessage({t:"vlmig",ls:LSD},"https://vlavologio.github.io"); }
+    if(e.data.t==="vlmig-ok"){ st.textContent="✅ Έγινε! Τα δεδομένα σου είναι στη νέα διεύθυνση. Μπορείς να κλείσεις αυτή τη σελίδα."; try{ localStorage.setItem("vl_moved","1"); }catch(x){} }
+  });
+  document.getElementById("dl").onclick=function(){
+    var j=JSON.stringify({app:"vlavologio",v:2,hist:[],ls:LSD}), fn="vlavologio-antigrafo-"+new Date().toISOString().slice(0,10)+".json", blob=new Blob([j],{type:"application/json"});
+    try{ var f=new File([blob],fn,{type:"application/json"}); if(navigator.canShare&&navigator.canShare({files:[f]})){ navigator.share({files:[f],title:"Βλαβολόγιο – αντίγραφο"}).catch(function(){}); return; } }catch(x){}
+    var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=fn; document.body.appendChild(a); a.click();
+  };
+}
+</script></body></html>
